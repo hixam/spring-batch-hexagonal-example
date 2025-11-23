@@ -36,10 +36,8 @@ public class TasksController {
     public ResponseEntity<String> startChunk() throws JobInstanceAlreadyCompleteException, InvalidJobParametersException, JobExecutionAlreadyRunningException, JobRestartException {
         JobParameters params = params("chunk");
         System.out.println("CHUNK PARAMS => " + params);
-        JobParametersBuilder builder = new JobParametersBuilder();
-        builder.addString("id", UUID.randomUUID().toString());
 
-        JobExecution jobExecution = jobOperator.start(importPersonsJob, builder.toJobParameters());
+        JobExecution jobExecution = jobOperator.start(importPersonsJob, params);
 
         return ResponseEntity.ok("Chunk started " + jobExecution.getJobInstanceId() );
     }
@@ -48,9 +46,7 @@ public class TasksController {
     public ResponseEntity<String> startTasklet() throws JobInstanceAlreadyCompleteException, InvalidJobParametersException, JobExecutionAlreadyRunningException, JobRestartException {
         JobParameters params = params("tasklet");
         System.out.println("tasklet PARAMS => " + params);
-        JobParametersBuilder builder = new JobParametersBuilder();
-        builder.addString("id", UUID.randomUUID().toString());
-        JobExecution jobExecution = jobOperator.start(helloTaskletJob, builder.toJobParameters());
+        JobExecution jobExecution = jobOperator.start(helloTaskletJob, params);
 
         return ResponseEntity.ok("tasklet started " + jobExecution.getJobInstanceId() );
     }
