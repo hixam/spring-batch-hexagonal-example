@@ -3,9 +3,9 @@ package com.example.batchExample.infrastructure.adapter.in.batch;
 import com.example.batchExample.application.dto.PersonIn;
 import com.example.batchExample.application.dto.PersonOut;
 import com.example.batchExample.application.port.in.NormalizePersonUseCase;
-import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
-import org.springframework.batch.infrastructure.item.ItemProcessor;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 public class PersonItemProcessor implements ItemProcessor<PersonIn, PersonOut> {
 

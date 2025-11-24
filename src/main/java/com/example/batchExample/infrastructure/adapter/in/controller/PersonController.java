@@ -2,10 +2,8 @@ package com.example.batchExample.infrastructure.adapter.in.controller;
 
 
 import com.example.batchExample.application.port.in.PersistPersonsUseCase;
-import com.example.batchExample.application.port.out.GetPersonPort;
 import com.example.batchExample.infrastructure.dto.PersonDto;
 import com.example.batchExample.infrastructure.mapper.PersonRecordMapper;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

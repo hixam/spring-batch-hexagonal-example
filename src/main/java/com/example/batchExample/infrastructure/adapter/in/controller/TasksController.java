@@ -1,17 +1,15 @@
 package com.example.batchExample.infrastructure.adapter.in.controller;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.batch.core.job.Job;
-import org.springframework.batch.core.job.JobExecution;
-import org.springframework.batch.core.job.parameters.InvalidJobParametersException;
-import org.springframework.batch.core.job.parameters.JobParameter;
-import org.springframework.batch.core.job.parameters.JobParameters;
-import org.springframework.batch.core.job.parameters.JobParametersBuilder;
-import org.springframework.batch.core.launch.*;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobOperator;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,39 +21,39 @@ import java.util.UUID;
 public class TasksController {
 
     private final JobOperator jobOperator;
-    private final Job helloTaskletJob;
-    private final Job importPersonsJob;
+//    private final Job helloTaskletJob;
+//    private final Job importPersonsJob;
 
-    public TasksController(JobOperator jobOperator, @Qualifier("helloTaskletJob") Job helloTaskletJob, @Qualifier("importPersonsJob") Job importPersonsJob){
+    public TasksController(JobOperator jobOperator){
         this.jobOperator = jobOperator;
-        this.helloTaskletJob = helloTaskletJob;
-        this.importPersonsJob = importPersonsJob;
+//        this.helloTaskletJob = helloTaskletJob;
+//        this.importPersonsJob = importPersonsJob;
     }
 
     @PostMapping("/chunk")
-    public ResponseEntity<String> startChunk() throws JobInstanceAlreadyCompleteException, InvalidJobParametersException, JobExecutionAlreadyRunningException, JobRestartException {
+    public ResponseEntity<String> startChunk() throws Exception{
         JobParameters params = params("chunk");
         System.out.println("CHUNK PARAMS => " + params);
 
-        JobExecution jobExecution = jobOperator.start(importPersonsJob, params);
+        Long jobExecution = jobOperator.startNextInstance("import-persons-job");
 
-        return ResponseEntity.ok("Chunk started " + jobExecution.getJobInstanceId() );
+        return ResponseEntity.ok("Chunk started " + jobExecution );
     }
 
     @PostMapping("/tasklet")
-    public ResponseEntity<String> startTasklet() throws JobInstanceAlreadyCompleteException, InvalidJobParametersException, JobExecutionAlreadyRunningException, JobRestartException {
+    public ResponseEntity<String> startTasklet() throws Exception{
         JobParameters params = params("tasklet");
         System.out.println("tasklet PARAMS => " + params);
-        JobExecution jobExecution = jobOperator.start(helloTaskletJob, params);
+        Long  jobExecution = jobOperator.startNextInstance("hello-tasklet-job");
 
-        return ResponseEntity.ok("tasklet started " + jobExecution.getJobInstanceId() );
+        return ResponseEntity.ok("tasklet started " + jobExecution );
     }
 
     private JobParameters params(String type) {
         return new JobParametersBuilder()
                 .addString("type", type)
                 .addLong("ts", System.currentTimeMillis())
-                .addString("execUUID", java.util.UUID.randomUUID().toString()) // <-- NUEVO
+                .addString("execUUID", UUID.randomUUID().toString()) // <-- NUEVO
                 .toJobParameters();
     }
 }

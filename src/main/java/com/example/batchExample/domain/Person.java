@@ -1,7 +1,5 @@
 package com.example.batchExample.domain;
 
-import java.util.Objects;
-
 public class Person {
     public String getFirstName() {
         return firstName;

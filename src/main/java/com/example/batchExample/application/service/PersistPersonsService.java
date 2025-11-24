@@ -1,6 +1,5 @@
 package com.example.batchExample.application.service;
 
-import com.example.batchExample.application.dto.PersonIn;
 import com.example.batchExample.application.dto.PersonOut;
 import com.example.batchExample.application.port.in.DenormalizePersonUseCase;
 import com.example.batchExample.application.port.in.PersistPersonsUseCase;

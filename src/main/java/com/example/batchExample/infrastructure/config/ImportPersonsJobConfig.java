@@ -6,16 +6,18 @@ import com.example.batchExample.application.port.in.NormalizePersonUseCase;
 import com.example.batchExample.application.port.in.PersistPersonsUseCase;
 import com.example.batchExample.infrastructure.adapter.in.batch.PersonItemProcessor;
 import com.example.batchExample.infrastructure.adapter.out.batch.PersonItemWriter;
-import org.springframework.batch.core.job.Job;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.step.Step;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.infrastructure.item.ItemProcessor;
-import org.springframework.batch.infrastructure.item.ItemWriter;
-import org.springframework.batch.infrastructure.item.file.FlatFileItemReader;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class ImportPersonsJobConfig {
@@ -34,10 +36,11 @@ public class ImportPersonsJobConfig {
     Step importPersonsStep(JobRepository jobRepository,
                            FlatFileItemReader<PersonIn> personCsvReader,
                            ItemProcessor<PersonIn, PersonOut> personProcessor,
-                           ItemWriter<PersonOut> personWriter) {
+                           ItemWriter<PersonOut> personWriter,
+                           PlatformTransactionManager transactionManager) {
 
         return new StepBuilder("import-persons-step", jobRepository)
-                .<PersonIn, PersonOut>chunk(3)
+                .<PersonIn, PersonOut>chunk(3, transactionManager)
                 .reader(personCsvReader)
                 .processor(personProcessor)
                 .writer(personWriter)
@@ -47,7 +50,7 @@ public class ImportPersonsJobConfig {
     @Bean(name = "importPersonsJob")
     Job importPersonsJob(JobRepository jobRepository, Step importPersonsStep) {
         return new JobBuilder("import-persons-job", jobRepository)
-
+                .incrementer(new RunIdIncrementer())
                 .start(importPersonsStep)
                 .build();
     }

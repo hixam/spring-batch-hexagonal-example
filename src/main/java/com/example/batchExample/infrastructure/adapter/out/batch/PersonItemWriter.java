@@ -2,8 +2,8 @@ package com.example.batchExample.infrastructure.adapter.out.batch;
 
 import com.example.batchExample.application.dto.PersonOut;
 import com.example.batchExample.application.port.in.PersistPersonsUseCase;
-import org.springframework.batch.infrastructure.item.Chunk;
-import org.springframework.batch.infrastructure.item.ItemWriter;
+import org.springframework.batch.item.Chunk;
+import org.springframework.batch.item.ItemWriter;
 
 import java.util.List;
 
