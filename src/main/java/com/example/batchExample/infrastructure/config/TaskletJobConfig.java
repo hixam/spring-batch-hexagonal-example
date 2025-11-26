@@ -1,15 +1,19 @@
 package com.example.batchExample.infrastructure.config;
 
+import com.example.batchExample.application.dto.PersonIn;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import javax.sql.DataSource;
 
 @Configuration
 public class TaskletJobConfig {
@@ -26,13 +30,41 @@ public class TaskletJobConfig {
                 .build();
     }
 
+    @Bean
+    public Step importPersonsJdbcStep(JobRepository jobRepository, PlatformTransactionManager txManager, DataSource dataSource) {
+        return new StepBuilder("import-persons-jdbc-step", jobRepository)
+                .tasklet((contribution, chunkContext) -> {
+                    // Este tasklet solo lee y procesa los datos (sin escribir)
+                    JdbcCursorItemReader<PersonIn> reader = new JdbcCursorItemReader<>();
+                    reader.setDataSource(dataSource);
+                    reader.setSql("SELECT first_name, last_name FROM person_out");
+                    reader.setRowMapper((rs, rowNum) -> new PersonIn(rs.getString("first_name"), rs.getString("last_name")));
+
+                    // Abrir el reader
+                    reader.open(chunkContext.getStepContext().getStepExecution().getExecutionContext());
+
+                    // Imprimir los datos leídos
+                    PersonIn person;
+                    while ((person = reader.read()) != null) {
+                        System.out.println("Person read: " + person.firstName() + " " + person.lastName());
+                    }
+
+                    // Cerrar el reader después de que se haya leído todo
+                    reader.close();
+
+                    return RepeatStatus.FINISHED; // Finaliza el Tasklet
+                }, txManager)
+                .build();
+    }
+
     @Bean(name = "helloTaskletJob")
     public Job helloTaskletJob(JobRepository jobRepository,
-                               Step helloTaskletStep) {
+                               Step helloTaskletStep, Step importPersonsJdbcStep) {
 
         return new JobBuilder("hello-tasklet-job", jobRepository)
-                .incrementer(new RunIdIncrementer())
+//                .incrementer(new RunIdIncrementer())
                 .start(helloTaskletStep)
+                .next(importPersonsJdbcStep)
                 .build();
     }
 }

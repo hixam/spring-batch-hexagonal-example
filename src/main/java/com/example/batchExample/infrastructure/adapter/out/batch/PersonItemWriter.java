@@ -2,6 +2,7 @@ package com.example.batchExample.infrastructure.adapter.out.batch;
 
 import com.example.batchExample.application.dto.PersonOut;
 import com.example.batchExample.application.port.in.PersistPersonsUseCase;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 

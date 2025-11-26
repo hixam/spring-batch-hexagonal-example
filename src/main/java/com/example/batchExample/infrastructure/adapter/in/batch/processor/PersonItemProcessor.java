@@ -1,4 +1,4 @@
-package com.example.batchExample.infrastructure.adapter.in.batch;
+package com.example.batchExample.infrastructure.adapter.in.batch.processor;
 
 import com.example.batchExample.application.dto.PersonIn;
 import com.example.batchExample.application.dto.PersonOut;
@@ -13,7 +13,7 @@ public class PersonItemProcessor implements ItemProcessor<PersonIn, PersonOut> {
     public PersonItemProcessor(NormalizePersonUseCase useCase) { this.useCase = useCase; }
 
     @Override
-    public @Nullable PersonOut process(@NonNull PersonIn item) throws Exception {
+    public @Nullable PersonOut process(@NonNull PersonIn item) {
         return useCase.normalize(item);
     }
 }
