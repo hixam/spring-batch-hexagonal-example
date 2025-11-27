@@ -7,11 +7,13 @@ import com.example.batchExample.application.port.in.PersistPersonsUseCase;
 import com.example.batchExample.infrastructure.adapter.in.batch.processor.PersonItemProcessor;
 import com.example.batchExample.infrastructure.adapter.out.batch.PersonItemWriter;
 import com.example.batchExample.infrastructure.adapter.out.persistence.entity.PersonRecord;
+import org.springframework.batch.core.ChunkListener;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
@@ -47,6 +49,26 @@ public class ImportPersonsJobConfig {
 //    }
 
     @Bean
+    public ChunkListener chunkLoggingListener() {
+        return new ChunkListener() {
+            @Override
+            public void beforeChunk(ChunkContext context) {
+                System.out.println(">> CHUNK START");
+            }
+
+            @Override
+            public void afterChunk(ChunkContext context) {
+                System.out.println("<< CHUNK COMMIT OK");
+            }
+
+            @Override
+            public void afterChunkError(ChunkContext context) {
+                System.out.println("!! CHUNK ERROR -> rollback");
+            }
+        };
+    }
+
+    @Bean
     Step importPersonsStepComposite(JobRepository jobRepository,
                                     @Qualifier("personCsvReader") ItemReader<PersonIn> reader,
                                     ItemProcessor<PersonIn, PersonOut> personProcessor,
@@ -63,6 +85,7 @@ public class ImportPersonsJobConfig {
 
                 .retry(PessimisticLockingFailureException.class).retryLimit(3)
 
+                .listener(chunkLoggingListener())
                 .build();
     }
 

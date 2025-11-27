@@ -1,8 +1,7 @@
 package com.example.batchExample.infrastructure.config;
 
 import com.example.batchExample.application.dto.PersonIn;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.Step;
+import org.springframework.batch.core.*;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -31,6 +30,51 @@ public class TaskletJobConfig {
     }
 
     @Bean
+    public StepExecutionListener importPersonsStepListener() {
+        return new StepExecutionListener() {
+            @Override
+            public void beforeStep(StepExecution stepExecution) {
+                System.out.println("STEP START -> " + stepExecution.getStepName());
+            }
+
+            @Override
+            public ExitStatus afterStep(StepExecution stepExecution) {
+                System.out.println("""
+                STEP END -> %s
+                read=%d write=%d commits=%d rollbacks=%d skips(process=%d write=%d)
+                """
+                        .formatted(stepExecution.getStepName(),
+                                stepExecution.getReadCount(),
+                                stepExecution.getWriteCount(),
+                                stepExecution.getCommitCount(),
+                                stepExecution.getRollbackCount(),
+                                stepExecution.getProcessSkipCount(),
+                                stepExecution.getWriteSkipCount()
+                        ));
+
+                return stepExecution.getExitStatus();
+            }
+        };
+    }
+
+    @Bean
+    public JobExecutionListener importPersonsJobListener() {
+        return new JobExecutionListener() {
+            @Override
+            public void beforeJob(JobExecution jobExecution) {
+                System.out.println("JOB START -> " + jobExecution.getJobInstance().getJobName()
+                        + " params=" + jobExecution.getJobParameters());
+            }
+
+            @Override
+            public void afterJob(JobExecution jobExecution) {
+                System.out.println("JOB END -> status=" + jobExecution.getStatus()
+                        + " exit=" + jobExecution.getExitStatus());
+            }
+        };
+    }
+
+    @Bean
     public Step importPersonsJdbcStep(JobRepository jobRepository, PlatformTransactionManager txManager, DataSource dataSource) {
         return new StepBuilder("import-persons-jdbc-step", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
@@ -54,6 +98,8 @@ public class TaskletJobConfig {
 
                     return RepeatStatus.FINISHED; // Finaliza el Tasklet
                 }, txManager)
+                .listener(importPersonsJobListener())
+                .listener(importPersonsStepListener())
                 .build();
     }
 

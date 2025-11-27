@@ -2,6 +2,7 @@ package com.example.batchExample.infrastructure.adapter.in.controller;
 
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.JobOperator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,8 +21,8 @@ public class TasksController {
     public static final String INPUT_CSV = "input.csv";
     public static final String CHUNK = "chunk";
     public static final String TASKLET = "tasklet";
-    private final JobOperator jobOperator;
 
+    private final JobOperator jobOperator;
     public TasksController(JobOperator jobOperator){
         this.jobOperator = jobOperator;
     }
@@ -59,7 +60,7 @@ public class TasksController {
         //MultiResources reader
 //        props.put("inputPattern", "classpath:/*.csv");
         props.put("outputFile", "/tmp/persons-out.csv");
-        props.put("run.id", String.valueOf(System.currentTimeMillis())); // si quieres nueva instancia
+        props.put("run.id", String.valueOf(System.currentTimeMillis()));
         return props;
     }
 }
