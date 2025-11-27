@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class PersonReaderFactory {
-    @Bean
+    @Bean("personCsvReader")
     @StepScope
     FlatFileItemReader<PersonIn> personCsvReader(@Value("#{jobParameters['inputFile']}") String inputFile) {
         return new FlatFileItemReaderBuilder<PersonIn>()

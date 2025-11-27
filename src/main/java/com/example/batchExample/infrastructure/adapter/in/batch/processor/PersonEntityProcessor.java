@@ -10,6 +10,6 @@ public class PersonEntityProcessor implements ItemProcessor<PersonRecord, Person
 
     @Override
     public PersonOut process(PersonRecord item) throws Exception {
-        return new PersonOut(item.getFirstName(), item.getLastName());
+        return item.getFirstName().equalsIgnoreCase("HICHAM") ? new PersonOut(item.getFirstName(), item.getLastName()) : null;
     }
 }

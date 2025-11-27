@@ -58,6 +58,7 @@ public class TasksController {
         props.put("inputFile", file);
         //MultiResources reader
 //        props.put("inputPattern", "classpath:/*.csv");
+        props.put("outputFile", "/tmp/persons-out.csv");
         props.put("run.id", String.valueOf(System.currentTimeMillis())); // si quieres nueva instancia
         return props;
     }

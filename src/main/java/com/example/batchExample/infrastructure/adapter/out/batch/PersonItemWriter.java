@@ -5,9 +5,13 @@ import com.example.batchExample.application.port.in.PersistPersonsUseCase;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
+@StepScope
 public class PersonItemWriter implements ItemWriter<PersonOut> {
 
     PersistPersonsUseCase persistPersonsUseCase;

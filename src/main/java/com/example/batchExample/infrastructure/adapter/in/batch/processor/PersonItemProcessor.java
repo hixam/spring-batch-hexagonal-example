@@ -14,6 +14,8 @@ public class PersonItemProcessor implements ItemProcessor<PersonIn, PersonOut> {
 
     @Override
     public @Nullable PersonOut process(@NonNull PersonIn item) {
-        return useCase.normalize(item);
+        return item.firstName().equalsIgnoreCase("HICHAM") ?
+                useCase.normalize(item)
+                : null;
     }
 }
