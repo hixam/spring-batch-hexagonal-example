@@ -21,6 +21,8 @@ public class TasksController {
     public static final String INPUT_CSV = "input.csv";
     public static final String CHUNK = "chunk";
     public static final String TASKLET = "tasklet";
+    public static final String IMPORT_PERSONS_PARALLEL_JOB = "import-persons-parallel-job";
+    public static final String PERSON_PARTITION_JOB = "person-partition-job";
 
     private final JobOperator jobOperator;
     public TasksController(JobOperator jobOperator){
@@ -39,6 +41,15 @@ public class TasksController {
     public ResponseEntity<String> startTasklet() throws Exception{
 
         Long  jobExecution = jobOperator.start(HELLO_TASKLET_JOB, props(TASKLET, INPUT_CSV));
+
+        return ResponseEntity.ok("tasklet started " + jobExecution );
+    }
+
+
+    @PostMapping("/parallel")
+    public ResponseEntity<String> startparallelChunk() throws Exception{
+
+        Long  jobExecution = jobOperator.start(PERSON_PARTITION_JOB, props(CHUNK, INPUT_CSV));
 
         return ResponseEntity.ok("tasklet started " + jobExecution );
     }
