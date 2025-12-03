@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.util.stream.IntStream;
+
 import javax.sql.DataSource;
 
 @Configuration
@@ -114,5 +116,13 @@ public class TaskletJobConfig {
                 .start(helloTaskletStep)
                 .next(importPersonsJdbcStep)
                 .build();
+    }
+
+    public int applyDiscountToMaxPrice(int[] prices, int discount) {
+
+        int max = IntStream.of(prices).max().orElse(0);
+        int discountedPrice = (int)Math.round(max - (discount* 0.01));
+
+        return discountedPrice;
     }
 }

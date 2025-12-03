@@ -238,42 +238,6 @@ public class ImportPersonsJobConfig {
                 .build();
     }
 
-    @Bean
-    public Step personWorkerStep(JobRepository jobRepository,
-                                 RepositoryItemReader<PersonRecord> personPartitionReader,
-                                 ItemProcessor<PersonRecord, PersonOut> processor,
-                                 @Qualifier("personItemWriter") ItemWriter<PersonOut> writer,
-                                 PlatformTransactionManager txManager) {
-
-        return new StepBuilder("person-worker-step", jobRepository)
-                .<PersonRecord, PersonOut>chunk(100, txManager)
-                .reader(personPartitionReader)
-                .processor(processor)
-                .writer(writer)
-                .build();
-    }
-
-    @Bean
-    public Step personPartitionedStep(JobRepository jobRepository,
-                                      PersonIdRangePartitioner partitioner,
-                                      Step personWorkerStep,
-                                      TaskExecutor jobTaskExecutor) {
-
-        return new StepBuilder("person-partitioned-step", jobRepository)
-                .partitioner("person-worker-step", partitioner)
-                .step(personWorkerStep)
-                .taskExecutor(jobTaskExecutor)
-                .build();
-    }
-
-    @Bean
-    public Job personPartitionJob(JobRepository jobRepository,
-                                  Step personPartitionedStep) {
-
-        return new JobBuilder("person-partition-job", jobRepository)
-                .start(personPartitionedStep)
-                .build();
-    }
 
     @Bean(name = "importPersonsJob")
     Job importPersonsJob(JobRepository jobRepository,

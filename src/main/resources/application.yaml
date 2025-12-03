@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: batchExample
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: batch
+    url: jdbc:mysql://localhost:3306/demo_batch?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+    username: batch
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      myCircuitBreaker:
+        failureRateThreshold: 50
+        maxWaitDurationInHalfOpenState: 500ms
+        permittedNumberOfCallsInHalfOpenState: 10
+        slidingWindowSize: 100
+        waitDurationInOpenState: 1000ms
+  ratelimiter:
+    instances:
+      myRateLimiter:
+        limitForPeriod: 10
+        limitRefreshPeriod: 1s
+        timeoutDuration: 500ms
+
+bulkhead:
+  instances:
+    apiBulkhead:
+      max-concurrent-calls: 5
+      max-wait-duration: 10ms
+logging:
+  level:
+    com:
+      masterclass: INFO
+    io:
+      github:
+        resilience4j: DEBUG
+    org:
+      springframework:
+        batch: INFO

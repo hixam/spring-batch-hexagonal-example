@@ -5,6 +5,10 @@ import com.example.batchExample.application.port.in.DenormalizePersonUseCase;
 import com.example.batchExample.application.port.in.PersistPersonsUseCase;
 import com.example.batchExample.application.port.out.GetPersonPort;
 import com.example.batchExample.application.port.out.SavePersonPort;
+import org.aspectj.weaver.IClassFileProvider;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

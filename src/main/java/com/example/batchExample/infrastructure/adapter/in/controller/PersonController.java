@@ -20,6 +20,7 @@ public class PersonController {
 
     public PersonController(PersistPersonsUseCase persistPersonsUseCase){this.persistPersonsUseCase = persistPersonsUseCase;}
 
+
     @GetMapping("/all")
     public ResponseEntity<List<PersonDto>> getPersonOut(){
         List<PersonDto> response = personRecordMapper.mapToListDTO(persistPersonsUseCase.getAll());
